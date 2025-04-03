@@ -1,2 +1,20 @@
 @import "tailwindcss";
 
+.btnStyle{
+    background: rgb(253, 181, 21);
+    color: #000 !important;
+    font-weight: 500;
+    border-color: rgb(255, 221, 129);
+}
+.btnStyle:hover{
+    background: rgb(255, 221, 129);
+    color: #000 !important;
+    font-weight: 500;
+    border-color: rgb(253, 181, 21);
+}
+.btnStyle:focus{
+    background: rgb(253, 181, 21);
+    color: #000 !important;
+    font-weight: 500;
+    border-color: rgb(255, 221, 129);
+}
