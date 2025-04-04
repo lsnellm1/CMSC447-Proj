@@ -1,5 +1,4 @@
-
-import ConfigureAmplifyClientSide from '@/app/amplify-cognito-config';
+import ConfigureAmplifyClientSide from '@/app/utlis/amplify';
 
 const backgroundStyle = {
   backgroundImage: 'url("https://styleguide.umbc.edu/wp-content/uploads/sites/113/2019/05/maryland-flag-backgrounds-landscape-gray.jpg")',
@@ -18,10 +17,10 @@ export default function SignInPageLayout({
     <html lang="en">
       <body style={backgroundStyle}>
         <>
-          <ConfigureAmplifyClientSide />     
-          {children}   
-        </>
-        </body>
+            <ConfigureAmplifyClientSide />
+            {children}
+        </>        
+      </body>
     </html>
   )
 }

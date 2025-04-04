@@ -1,5 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.css'
 import "../../styles/globals.css"
+import UMBCSHIELD from "../../../../public/imgs/UMBC-justSHIELD-color-for-black-backgrounds.png"
+import Image from 'next/image';
 
 export default function SignInPage() {
 
@@ -16,7 +18,13 @@ export default function SignInPage() {
 
                     <div className='row'>
                         <div className='col-md-12 text-center align-items-center justify-content-center'>
-                            <img src={"https://styleguide.umbc.edu/wp-content/uploads/sites/113/2019/08/UMBC-justSHIELD-color-for-black-backgrounds.png"} alt="logo" className='img-fluid d-block mx-auto' style={{width: "100px", height: "auto"}}/>
+                            <Image
+                            src={UMBCSHIELD}  // Adjusted path to the local image
+                            alt="UMBC logo"
+                            className="img-fluid d-block mx-auto"
+                            width={100}  // Set width
+                            height={100}  // Set height (or adjust to auto if needed, but width/height are required by Next.js Image component)
+                            />    
                         </div>
                     </div>
 
@@ -42,14 +50,11 @@ export default function SignInPage() {
 
                     <div className='row mt-4 justify-content-center align-items-center'>
                         <div className='col-md-8 text-center'>
-                            <a href="#" className='text-decoration-none'>Don&apos;t have an account? Sign Up</a>
+                            <a href="/signup" className='text-decoration-none'>Don&apos;t have an account? Sign Up</a>
                         </div>
                     </div>
                 </div>
             </div>
-        
-        
-        
         </>
     );
 
