@@ -2,9 +2,12 @@ import React, { useState, ChangeEvent } from 'react';
 
 interface SearchBarProps {
   onSearch: (searchTerm: string) => void;
+  defaultText?: string;
+  className?: string;
+  width?: string;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
+const SearchBar: React.FC<SearchBarProps> = ({ onSearch, defaultText = "", className = "", width = "50px"}) => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -15,9 +18,17 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
   return (
     <input
       type="text"
-      placeholder="Search..."
+      placeholder={defaultText}
       value={searchTerm}
       onChange={handleInputChange}
+      style={{
+        paddingLeft: '5px', 
+        borderRadius: '5px',
+        border: '2px solid light-grey',
+        marginRight: '10px',
+        width: `${width}%`
+      }}
+      className={className}
     />
   );
 };
