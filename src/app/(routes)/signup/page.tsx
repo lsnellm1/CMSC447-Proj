@@ -15,10 +15,13 @@ export default function SignInPage() {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [signupStatus, setSignupStatus] = useState(false);
+    const [signupMsg, setSignupMsg] = useState('');
+
     async function handleSubmit(event: FormEvent<HTMLFormElement>){
         event.preventDefault()
         try{
-            const {nextStep} = await signUp({   
+            const {} = await signUp({   
                 username: email,
                 password: password,
                 options: {
@@ -28,26 +31,57 @@ export default function SignInPage() {
                     },
                 },
             })
+            setSignupMsg("Sign Up Successful. Please check your email for a verification code.");
+            setSignupStatus(true);
+
         }
         catch (error) {
-            console.error(String(error));
-            switch (String(error)) {
-                case "UsernameExistsException":
-                    console.log("User already exists. Please log in instead.");
+            setSignupStatus(false);
+            console.log(String(error));
+            switch(String(error)) {
+                case "UsernameExistsException: User already exists":
+                    setSignupMsg("User already exists. Please log in instead.");
+                    break;
+                case "InvalidPasswordException: Password did not conform with policy: Password must have uppercase characters":
+                    setSignupMsg("Password must have at least one uppercase letter.");
+                    break;
+                default:
+                    setSignupMsg("An Unknown Error Occurred. Please try again.");
                     break;
             }
-
         }
 
+        setTimeout(() => {
+            setSignupMsg('');
+          }, 5000); 
     }
 
-
-    
-  
     return(
         <>
             <form onSubmit={handleSubmit} className="container d-flex align-items-center justify-content-center min-vh-100">
                 <div className='rounded border border-2 w-100 h-100 p-5 bg-light' style={{boxShadow:"rgba(0, 0, 0, 0.24) 0px 3px 8px;",minWidth: "100px",minHeight: "100px",maxWidth: "600px", maxHeight: "600px"}}>
+                    
+                    { !signupStatus && signupMsg != '' && (
+                        <div className='row'>
+                            <div className='col-md-12 text-center'>
+                                <div className="alert alert-danger" role="alert">
+                                   {signupMsg}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    { signupStatus && signupMsg != '' && (
+                        <div className='row'>
+                            <div className='col-md-12 text-center'>
+                                <div className="alert alert-success" role="alert">
+                                   {signupMsg}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+
                     <div className='row'>
                         <div className='col-md-12 text-center'>
                             <p className='fs-2'>Sign-Up</p>
