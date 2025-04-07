@@ -3,19 +3,14 @@ import 'bootstrap/dist/css/bootstrap.css'
 import "../../styles/globals.css"
 import UMBCSHIELD from "../../../../public/imgs/UMBC-justSHIELD-color-for-black-backgrounds.png"
 import Image from 'next/image';
-import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import { getSession } from '@auth0/nextjs-auth0';
 import LogOutButton from '../features/userpage/logout';
+import { neon } from '@neondatabase/serverless';
 
 export default async function UserPage() {
     const session = await getSession();
-    
-
-
-
-
     if (!session) {
         return (
             <div className="container text-center mt-5">
@@ -23,10 +18,21 @@ export default async function UserPage() {
             </div>
         );
     }
+    const sql = neon(`${process.env.DATABASE_URL}`);
 
+    //get student information from the database
+    const userResult = await sql`SELECT * FROM students WHERE email = ${session.user.email}`;
 
+    //get student classes from the database
+    const userClasses = await sql `
+        SELECT classes
+        FROM student_classes
+        JOIN students USING (student_id)
+        JOIN classes USING (class_id)
+        WHERE student_id = ${userResult[0].student_id};
+    `;
 
-
+    console.log(userClasses);
 
     return (
         <>
@@ -42,7 +48,7 @@ export default async function UserPage() {
                             height={24}  // Set height (or adjust to auto if needed, but width/height are required by Next.js Image component)
                         />  
                     </a>
-                    <span className='text-center'>Welcome {session.user.name}</span>
+                    <span className='text-center'>Welcome {userResult[0].student_name}</span>
                     <LogOutButton></LogOutButton>
                 </div>
 
@@ -51,40 +57,47 @@ export default async function UserPage() {
             <div className="container min-vh-100 mt-4">
                 <div className="row">
                     <div className="col-md-2 mb-4 ">
-                        <div className="row mb-3 align-items-center justify-content-center text-center">
-                            <div className="col-md-12">
-                                <FontAwesomeIcon  icon={faUserCircle}  style={{ maxWidth: '125px',width: '100%', height: '100%', maxHeight: '125px' }} />
-                            </div>   
-                        </div>   
-
-                        <div className='row'>
-                            <div className='col-md-12'>
-                                <p className=''><strong>Grade</strong> Junior</p>
+                        <div className="card">
+                            <div className="card-header">
+                                Profile
                             </div>
-                        </div>
+                            <div className="card-body">
+                                <div className="row mb-3 align-items-center justify-content-center text-center">
+                                    <div className="col-md-12 mx-auto">
+                                        <FontAwesomeIcon  icon={faUserCircle}  style={{ maxWidth: '125px',width: '100%', height: '100%', maxHeight: '125px' }} />
+                                    </div>   
+                                </div>   
 
-                        <div className='row'>
-                            <div className='col-md-12'>
-                                <p className=''><strong>GPA</strong> 3.87</p>
-                            </div>
-                        </div>
+                                <div className='row'>
+                                    <div className='col-md-12'>
+                                        <p className=''><strong>Grade</strong> {userResult[0].current_status}</p>
+                                    </div>
+                                </div>
 
-                        <div className='row'>
-                            <div className='col-md-12'>
-                                <p className=''><strong>Credits Taken</strong> 80</p>
-                            </div>
-                        </div>
+                                <div className='row'>
+                                    <div className='col-md-12'>
+                                        <p className=''><strong>GPA</strong> {userResult[0].gpa}</p>
+                                    </div>
+                                </div>
 
-                        <div className='row'>
-                            <div className='col-md-12'>
-                                <p className=''><strong>Credits Remaining</strong> 40</p>
+                                <div className='row'>
+                                    <div className='col-md-12'>
+                                        <p className=''><strong>Credits Taken</strong> {userResult[0].total_credits}</p>
+                                    </div>
+                                </div>
+
+                                <div className='row'>
+                                    <div className='col-md-12'>
+                                        <p className=''><strong>Credits Remaining</strong> {userResult[0].credits_left}</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div className="col-md-7 text-center mb-4">
+                    <div className="col-md-7 text-center mb-4 h-100">
                         <div className="row mb-2">
-                            <div className="col-md-12">
+                            <div className="col-md-12 h-100">
                                 <div className="card">
                                     <div className="card-header">
                                         Counselor Alerts
@@ -95,6 +108,20 @@ export default async function UserPage() {
                                 </div>
                             </div>   
                         </div>   
+
+                        <div className="row mb-2">
+                            <div className="col-md-12 h-100">
+                                <div className="card">
+                                    <div className="card-header">
+                                        Current Classes
+                                    </div>
+                                    <div className="card-body">
+                                        <p className="card-text">None at the moment... Check back with us soon!</p>
+                                    </div>
+                                </div>
+                            </div>   
+                        </div>  
+
                     </div>
                     <div className="col-md-3 mb-4">
                         <div className="row mb-2">
