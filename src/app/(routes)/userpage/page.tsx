@@ -1,3 +1,4 @@
+
 import 'bootstrap/dist/css/bootstrap.css'
 import "../../styles/globals.css"
 import UMBCSHIELD from "../../../../public/imgs/UMBC-justSHIELD-color-for-black-backgrounds.png"
@@ -6,6 +7,7 @@ import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import { getSession } from '@auth0/nextjs-auth0';
+import LogOutButton from '../features/userpage/logout';
 
 export default async function UserPage() {
     const session = await getSession();
@@ -41,16 +43,16 @@ export default async function UserPage() {
                         />  
                     </a>
                     <span className='text-center'>Welcome {session.user.name}</span>
-                    <Link href="/api/auth/logout" className="link-underline-opacity-0 link-secondary">Sign Out</Link>
+                    <LogOutButton></LogOutButton>
                 </div>
 
             </nav>
 
             <div className="container min-vh-100 mt-4">
                 <div className="row">
-                    <div className="col-md-2 mb-4">
-                        <div className="row mb-3">
-                            <div className="col-md-12 align-items-center justify-content-center text-center">
+                    <div className="col-md-2 mb-4 ">
+                        <div className="row mb-3 align-items-center justify-content-center text-center">
+                            <div className="col-md-12">
                                 <FontAwesomeIcon  icon={faUserCircle}  style={{ maxWidth: '125px',width: '100%', height: '100%', maxHeight: '125px' }} />
                             </div>   
                         </div>   
