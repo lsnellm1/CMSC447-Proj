@@ -1,10 +1,12 @@
 "use client"
 import React, { useState } from 'react';
 
+//needed to disable temp to run on prod server
+
+
 const NumberSpinner = () => {
   const [value, setValue] = useState(0);
-
-  //needed to disable temp to run on prod server
+/*
   const handleChange = (event: unknown) => {
     //setValue(Number(event.target.value)); // Update state with input value
   };
@@ -16,6 +18,13 @@ const NumberSpinner = () => {
         onChange={handleChange}
       />
   );
+  */
+  return ( 
+  <div>
+    Remove me when you add the spinner component
+  </div>
+  );
+
 };
 
 export default NumberSpinner;

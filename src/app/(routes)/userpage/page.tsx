@@ -41,7 +41,7 @@ export default async function UserPage() {
                         />  
                     </a>
                     <span className='text-center'>Welcome {session.user.name}</span>
-                    <Link href="/api/auth/logout" className="">Sign Out</Link>
+                    <Link href="/api/auth/logout" className="link-underline-opacity-0 link-secondary">Sign Out</Link>
                 </div>
 
             </nav>
