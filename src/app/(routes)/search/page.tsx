@@ -4,7 +4,9 @@ import 'bootstrap/dist/css/bootstrap.css'
 import "../../styles/globals.css"
 import "./searchbar.tsx"
 import SearchBar from './searchbar.tsx'
-import NumberSpinner from './spinner.tsx';
+  //needed to disable temp to run on prod server
+
+//import NumberSpinner from './spinner.tsx';
 
 export default function SearchPage() {
     return (

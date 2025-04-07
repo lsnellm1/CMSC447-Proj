@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDom from 'react-dom';
 import { UserProvider } from '@auth0/nextjs-auth0/client';
 
 

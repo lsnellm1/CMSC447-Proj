@@ -4,8 +4,9 @@ import React, { useState } from 'react';
 const NumberSpinner = () => {
   const [value, setValue] = useState(0);
 
-  const handleChange = (event: any) => {
-    setValue(Number(event.target.value)); // Update state with input value
+  //needed to disable temp to run on prod server
+  const handleChange = (event: unknown) => {
+    //setValue(Number(event.target.value)); // Update state with input value
   };
 
   return (

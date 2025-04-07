@@ -2,7 +2,7 @@ import 'bootstrap/dist/css/bootstrap.css'
 import "../../styles/globals.css"
 import UMBCSHIELD from "../../../../public/imgs/UMBC-justSHIELD-color-for-black-backgrounds.png"
 import Image from 'next/image';
-
+import Link from 'next/link';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import { getSession } from '@auth0/nextjs-auth0';
@@ -41,7 +41,7 @@ export default async function UserPage() {
                         />  
                     </a>
                     <span className='text-center'>Welcome {session.user.name}</span>
-                    <a href="/api/auth/logout">Sign out</a>
+                    <Link href="/api/auth/logout" className="">Sign Out</Link>
                 </div>
 
             </nav>
