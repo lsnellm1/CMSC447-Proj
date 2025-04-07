@@ -1,21 +1,31 @@
-"use client"
 import 'bootstrap/dist/css/bootstrap.css'
 import "../../styles/globals.css"
 import UMBCSHIELD from "../../../../public/imgs/UMBC-justSHIELD-color-for-black-backgrounds.png"
 import Image from 'next/image';
-import type { FormEvent } from "react"
-import { Amplify } from "aws-amplify"
 
-import outputs from "../../../../amplify_outputs.json"
-import { useState } from "react";
-import { useRouter } from 'next/navigation';
-import { signOut } from 'aws-amplify/auth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
+import { getSession } from '@auth0/nextjs-auth0';
 
-Amplify.configure(outputs)
+export default async function UserPage() {
+    const session = await getSession();
+    
 
-export default function UserPage() {
+
+
+
+    if (!session) {
+        return (
+            <div className="container text-center mt-5">
+                <h1>Loading...</h1>
+            </div>
+        );
+    }
+
+
+
+
+
     return (
         <>
         
@@ -30,8 +40,8 @@ export default function UserPage() {
                             height={24}  // Set height (or adjust to auto if needed, but width/height are required by Next.js Image component)
                         />  
                     </a>
-                    <span className='text-center'>Welcome User</span>
-                    Sign out
+                    <span className='text-center'>Welcome {session.user.name}</span>
+                    <a href="/api/auth/logout">Sign out</a>
                 </div>
 
             </nav>
@@ -40,9 +50,8 @@ export default function UserPage() {
                 <div className="row">
                     <div className="col-md-2 mb-4">
                         <div className="row mb-3">
-                            <div className="col-md-12">
-                                <FontAwesomeIcon  icon={faUserCircle} size="9x" />
-                                <input id='profileImg' type="file"/>
+                            <div className="col-md-12 align-items-center justify-content-center text-center">
+                                <FontAwesomeIcon  icon={faUserCircle}  style={{ maxWidth: '125px',width: '100%', height: '100%', maxHeight: '125px' }} />
                             </div>   
                         </div>   
 

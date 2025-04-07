@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 .btnStyle{
-    background: rgb(253, 181, 21);
+    background: #fdb515;
     color: #000 !important;
     font-weight: 500;
     border-color: rgb(255, 221, 129);
