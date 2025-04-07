@@ -25,14 +25,14 @@ export default async function UserPage() {
 
     //get student classes from the database
     const userClasses = await sql `
-        SELECT classes
-        FROM student_classes
-        JOIN students USING (student_id)
-        JOIN classes USING (class_id)
-        WHERE student_id = ${userResult[0].student_id};
+        SELECT c.*
+        FROM student_classes sc
+        JOIN students s USING (student_id)
+        JOIN classes c USING (class_id)
+        WHERE sc.student_id = ${userResult[0].student_id};
     `;
 
-    console.log(userClasses);
+    console.log(userClasses[0].class_name);
 
     return (
         <>
@@ -116,7 +116,9 @@ export default async function UserPage() {
                                         Current Classes
                                     </div>
                                     <div className="card-body">
-                                        <p className="card-text">None at the moment... Check back with us soon!</p>
+                                        {userClasses.map((userClass,index) => (
+                                            <p className="card-text" key={index}>{userClass.class_name} With Professor {userClass.teacher_name} For {userClass.class_credits} Credits</p>))
+                                        }
                                     </div>
                                 </div>
                             </div>   
