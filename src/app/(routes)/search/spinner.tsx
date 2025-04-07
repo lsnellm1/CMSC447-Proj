@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 
 
 const NumberSpinner = () => {
-  const [value, setValue] = useState(0);
+  //const [value, setValue] = useState(0);
 /*
   const handleChange = (event: unknown) => {
     //setValue(Number(event.target.value)); // Update state with input value
