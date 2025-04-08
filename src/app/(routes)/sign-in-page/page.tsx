@@ -18,6 +18,6 @@ export default function SignInPage() {
             }
         }
     }
-    , [isLoading, router]); // Add user and router as dependencies
+    , [isLoading, router, user]); // Add user and router as dependencies
     return;
 }

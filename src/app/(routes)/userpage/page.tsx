@@ -2,6 +2,7 @@
 import 'bootstrap/dist/css/bootstrap.css'
 import "../../styles/globals.css"
 import UMBCSHIELD from "../../../../public/imgs/UMBC-primary-logo-RGB.png"
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import NAVSHIELD from "../../../../public/imgs/UMBC-vertical-logo-1C-black.png"
 import Image from 'next/image';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
