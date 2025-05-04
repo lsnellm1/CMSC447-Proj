@@ -1,19 +1,20 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import { useState } from "react";
 
-const Dropdown = () => {
-    const [isOpen, setIsOpen] = useState(false);
+export const Dropdown = () => {
+    const [selectedAttributes, setSelectedAttributes] = useState<string[]>([]);
 
-    const toggleDropdown = () => {
-        setIsOpen(!isOpen);
-    }
+    const handleCheckboxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const attribute = event.target.value;
+        const isChecked = event.target.checked;
 
-    const closeDropdown = () => {
-        setIsOpen(false);
-    }
+        setSelectedAttributes(prev => 
+            isChecked 
+                ? [...prev, attribute]
+                : prev.filter(attr => attr !== attribute)
+        );
+    };
 
-    // Should add a way to change what requirements exist
     return (
         <div className="dropdown" id="attributes-input">
             <button 
@@ -23,24 +24,30 @@ const Dropdown = () => {
                 aria-expanded="false" 
                 data-bs-auto-close="outside"
                 style={{
-                    width: "200px",
+                    width: "175px",
                 }}
             > Select Attributes
             </button>
-            <form className="dropdown-menu p-4">
-                <div className="mb-3">
+            <form className="dropdown-menu p-3">
+                <div className="mb-2">
                     <div className="form-check">
-                        <input type="checkbox" className="form-check-input" id="dropdownCheck1" />
+                        <input 
+                            type="checkbox" 
+                            className="form-check-input" 
+                            id="dropdownCheck1"
+                            value="Writing Intensive"
+                            onChange={handleCheckboxChange}
+                        />
                         <label className="form-check-label" htmlFor="dropdownCheck1">Writing Intensive</label>
                     </div>
                 </div>
-                <div className="mb-3">
+                <div className="mb-2">
                     <div className="form-check">
                         <input type="checkbox" className="form-check-input" id="dropdownCheck2"></input>
                         <label className="form-check-label" htmlFor="dropdownCheck2">GEP</label>
                     </div>
                 </div>
-                <div className="mb-3">
+                <div className="mb-2">
                     <div className="form-check">
                         <input type="checkbox" className="form-check-input" id="dropdownCheck3"></input>
                         <label className="form-check-label" htmlFor="dropdownCheck3">GFR</label>
@@ -51,4 +58,5 @@ const Dropdown = () => {
     )
 }
 
-export default Dropdown;
+// Add this to access the selected attributes in handleSearch
+// document.getElementById('attributes-input')?.getAttribute('data-selected-attributes')?.split(',')
