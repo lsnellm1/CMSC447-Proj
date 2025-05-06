@@ -1,6 +1,6 @@
 import type { NextConfig } from 'next'
- 
-const nextConfig: NextConfig = {
+
+const nextConfig = {
   async redirects() {
     return [
       // Basic redirect
@@ -9,14 +9,15 @@ const nextConfig: NextConfig = {
         destination: '/sign-in-page',
         permanent: true,
       }
-    ]
+    ];
+  },
+  images: {
+    domains: ['lh3.googleusercontent.com'], // Add the domains you want to allow
   },
   env: {
-    AWS_COGNITO_REGION: process.env.AWS_COGNITO_REGION,
-    AWS_COGNITO_POOL_ID: process.env.AWS_COGNITO_POOL_ID,
-    AWS_COGNITO_APP_CLIENT_ID: process.env.AWS_COGNITO_APP_CLIENT_ID,
-},
-}
+    MY_ENV_KEY: process.env.DATABASE_URL, // Add your environment key-value pair here
+  },
+} satisfies NextConfig;
  
 export default nextConfig
 

@@ -1,135 +1,226 @@
-
 import 'bootstrap/dist/css/bootstrap.css'
 import "../../styles/globals.css"
 import UMBCSHIELD from "../../../../public/imgs/UMBC-primary-logo-RGB.png"
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import NAVSHIELD from "../../../../public/imgs/UMBC-vertical-logo-1C-black.png"
 import Image from 'next/image';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import { getSession } from '@auth0/nextjs-auth0';
-import LogOutButton from '../features/userpage/logout';
 import { neon } from '@neondatabase/serverless';
+import LogOutButton from '../features/userpage/logout';
 import Link from 'next/link';
-
-export default async function UserPage() {
+import { redirect } from 'next/navigation';
+import  CreateUser  from '../../api/sql/userRole';
+async function getUserRole(){
     const session = await getSession();
-    if (!session) {
-        return (
-            <div className="container text-center mt-5">
-                <h1>Loading...</h1>
-            </div>
-        );
+    if (!session) { 
+        redirect('/api/auth/login');
     }
+
     const sql = neon(`${process.env.DATABASE_URL}`);
+    //check if the user is admin
+    const adminUser = await sql`SELECT * FROM counselors WHERE email = ${session.user.email}`;
+    if (adminUser.length > 0) {
+        redirect('/adminpage');
+    }
 
     //get student information from the database
-    const userResult = await sql`SELECT * FROM students WHERE email = ${session.user.email}`;
-
+    let studentUser = await sql`SELECT * FROM students WHERE email = ${session.user.email}`;
+    if (studentUser.length === 0) {
+        await CreateUser(session);
+        studentUser = await sql`SELECT * FROM students WHERE email = ${session.user.email}`;
+    }
+    
     //get student classes from the database
-    const userClasses = await sql `
-        SELECT c.*
-        FROM student_classes sc
-        JOIN students s USING (student_id)
-        JOIN classes c USING (class_id)
-        WHERE sc.student_id = ${userResult[0].student_id};
+    const Counselor = await sql `
+        SELECT * FROM counselors WHERE counselor_id = ${studentUser[0].counselor_id};
     `;
 
-    console.log(userClasses[0].class_name);
+    const recommendations = await sql`
+        SELECT * FROM classes WHERE class_name = ANY(${studentUser[0].class_recommendations});
+    `;
 
+    return {session: session,userInformation: studentUser[0],counselor: Counselor[0], recommendations: recommendations};
+}
+
+export default async function UserPage() {
+        
+
+
+    //check if the user is admin
+    const getUser = await getUserRole();
+    const session = getUser.session;
+    const studentUser = getUser.userInformation;
+    const counselor = getUser.counselor;
+    const recommendations = getUser.recommendations;
     return (
         <>
-            <nav className="navbar bg-body-tertiary navsettings"  >
-                <div className="container">
-                    <a className="navbar-brand" href="#">
+            <nav className="navbar bg-light shadow-sm py-3 navsettings" style={{ borderBottom: "2px solid #dee2e6" }}>
+                <div className="container d-flex justify-content-between align-items-center">
+                    <a className="navbar-brand d-flex align-items-center" href="#">
                         <Image
-                            src={UMBCSHIELD} // Adjusted path to the local image
+                            src={UMBCSHIELD}
                             alt="UMBC logo"
-                            className="d-inline-block align-text-top p-2"
-                            width={150}  // Set width
-                            height={0}  // Set height (or adjust to auto if needed, but width/height are required by Next.js Image component)
-                        />  
+                            className="d-inline-block align-text-top"
+                            width={120}
+                            height={0}
+                            style={{ maxHeight: "50px", objectFit: "contain" }}
+                        />
                     </a>
-                    <span className='text-center' style={{color:"black"}}>Welcome <strong>{userResult[0].student_name}</strong></span>
-                    <LogOutButton></LogOutButton>
+                    <span className="text-center" style={{ color: "#343a40", fontSize: "1.1rem", fontWeight: "500" }}>
+                        Welcome, <strong>{studentUser.student_name}</strong>
+                    </span>
+                    <LogOutButton />
                 </div>
             </nav>
 
-            <div className="container w-100" style={{ maxWidth: '800px' }}>
-
-                <div className="row justify-content-center align-items-center mt-3 p-2 border rounded" style={{background: "white", boxShadow:"rgba(99, 99, 99, 0.2) 0px 2px 8px 0px"}} >
+            <div className="container w-100 rounded" style={{ maxWidth: '800px', background: "white", boxShadow:"rgba(99, 99, 99, 0.2) 0px 2px 8px 0px"}}>
+                <div className="row justify-content-center align-items-center mt-4 p-3" style={{borderRadius: "10px"}}>
                     <div className="col-lg-9">
-                        <div className='d-flex align-items-center'>
-                            <FontAwesomeIcon className='p-2'  icon={faUserCircle}  style={{ maxWidth: '90px',width: '100%', height: '100%', maxHeight: '90px' }} />
-                            <h2 className='ms-3'>Undergraduate CMSC</h2>
+                        <div className="d-flex align-items-center">
+                            <Image
+                                src={session.user.picture}
+                                alt="User Profile"
+                                className="p-2 rounded-circle border"
+                                width={90}
+                                height={90}
+                                style={{ objectFit: "cover", border: "2px solid #dee2e6" }}
+                            />
+                            <div className="ms-3">
+                                <h2 className="mb-1" style={{ fontSize: "1.5rem", fontWeight: "bold", color: "#343a40" }}>Undergraduate CMSC</h2>
+                                <p className="mb-0" style={{ fontSize: "0.9rem", color: "#6c757d" }}>User Profile</p>
+                            </div>
                         </div>
-                    </div>  
-                    <div className="col-lg-3">
-                        <Link href="/search" className="btn rounded-pill btnStyle">Class Search</Link>
+                    </div>
+                    <div className="col-lg-3 text-lg-end text-center mt-3 mt-lg-0">
+                        <Link href="/search" className="btnStyle btn btn-primary rounded-pill px-4 py-2" style={{ fontSize: "1rem", fontWeight: "500" }}>
+                            Class Search
+                        </Link>
                     </div>
                 </div>
 
-                <div className="row justify-content-center mt-2 p-2 border rounded" style={{background: "white", boxShadow:"rgba(99, 99, 99, 0.2) 0px 2px 8px 0px"}}>
-                    <div className="col-lg-12 h-100">
-                        <h5 className="">Advisor Alerts</h5>
-                        None at the moment... Check back with us soon!
+                <div className="row mt-3 p-3">
+                    <div className="col-lg-12">
+                        <h5 className="mb-3" style={{ fontWeight: "bold"}}>Advisor Alert</h5>
+                        {studentUser.alerts && studentUser.alerts.length > 0 ? (
+                            <div 
+                                className="alert text-center" 
+                                role="alert" 
+                                style={{ 
+                                    fontSize: "1rem", 
+                                    padding: "20px", 
+                                    borderRadius: "10px", 
+                                    backgroundColor: "#d1ecf1", 
+                                    color: "#0c5460" 
+                                }}
+                            >
+                                <p className="mb-0">{studentUser.alerts}</p>
+                            </div>
+                        ) : (
+                            <div 
+                                className="alert text-center" 
+                                role="alert" 
+                                style={{ 
+                                    fontSize: "1rem", 
+                                    padding: "20px", 
+                                    borderRadius: "10px", 
+                                    backgroundColor: "#d1ecf1", 
+                                    color: "#0c5460" 
+                                }}
+                            >
+                                <p className="mb-0">No alerts at the moment. Check back with us soon!</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                <div className="row mt-2 justify-content-center p-3 rounded ">
+
+                    <h5 className="mb-3" style={{ fontWeight: "bold"}}>Academic Advisor</h5>
+                    <div className="col-md-6">
+                        <div>
+                            <h6 className="mb-1">Name</h6>
+                            <p className="mb-0">{counselor.name}</p>
+                        </div>
                     </div>   
-                </div>   
+                    <div className='col-md-6'>
+                        <div>
+                            <h6 className="mb-1">Email</h6>
+                            <p className="mb-0">{counselor.email}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="row justify-content-center mt-2 p-3">
+                    <div className="col-lg-12">
+                        <h5 className="mb-3" style={{ fontWeight: "bold"}}>Degree Progress</h5>
+                        <div 
+                            className="progress shadow-sm" 
+                            style={{ height: "35px", borderRadius: "20px", overflow: "hidden", backgroundColor: "#e9ecef" }}
+                        >
+                            <div
+                                className="progress-bar progress-bar-striped progress-bar-animated bg-success"
+                                style={{ 
+                                    width: `${(studentUser.total_credits / 120) * 100}%`, 
+                                    fontSize: "1rem", 
+                                    fontWeight: "500" 
+                                }}
+                                role="progressbar"
+                                aria-valuenow={(studentUser.total_credits / 120) * 100}
+                                aria-valuemin={0}
+                                aria-valuemax={100}
+                            >
+                                {Math.round((studentUser.total_credits / 120) * 100)}% Complete
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className='row mt-3 p-2 text-center'>
+                    <div className="col-md-3">
+                        <h6 className="mb-1">Grade</h6>
+                        <p>{studentUser.current_status}</p>
+                    </div>
+                    <div className="col-md-3">
+                        <h6 className="mb-1">GPA</h6>
+                        <p>{studentUser.gpa}</p>
+                    </div>
+                    <div className="col-md-3">
+                        <h6 className="mb-1">Credits Taken</h6>
+                        <p>{studentUser.total_credits}</p>
+                    </div>
+                    <div className="col-md-3">
+                        <h6 className="mb-1">Credits Left</h6>
+                        <p>{studentUser.credits_left}</p>
+                    </div>  
+                </div>
 
                 
-                <div className="row mt-2 justify-content-center p-2 border rounded" style={{background: "white", boxShadow:"rgba(99, 99, 99, 0.2) 0px 2px 8px 0px"}}>
-                    <div className="col-lg-12">
-                        <h5 className="">Academic Advisor</h5>
-                        {userResult[0].counselor_name}
-                    </div>   
-                </div>
 
-                <div className="row justify-content-center mt-2 p-2 border rounded" style={{background: "white", boxShadow:"rgba(99, 99, 99, 0.2) 0px 2px 8px 0px"}}>
-                    <div className="col-lg-12 h-100">
-                        <h5 className="">Degree</h5>
-                        <small>75% Complete</small>
-                        <div className="progress" role="progressbar">
-                            <div className="progress-bar progress-bar-striped bg-success progress-bar-animated" style={{width: "75%"}}></div>
-                        </div>
-                    </div>   
-                </div> 
-
-                <div className='row justify-content-center mt-2 p-2 border rounded' style={{background: "white", boxShadow:"rgba(99, 99, 99, 0.2) 0px 2px 8px 0px"}}>
-                    <div className="col-md-3">
-                        <strong>Grade</strong> {userResult[0].current_status}
-                    </div>
-                    <div className="col-md-3">
-                        <strong>GPA</strong> {userResult[0].gpa}
-                    </div>
-                    <div className="col-md-3">
-                        <strong>Credits Taken</strong> {userResult[0].total_credits} 
-                    </div>
-                    <div className="col-md-3">
-                        <strong>Credits Remaining</strong> {userResult[0].credits_left}
-                    </div>  
-                </div>
-
-
-                <div className="row mt-2 justify-content-center p-2 border rounded" style={{background: "white", boxShadow:"rgba(99, 99, 99, 0.2) 0px 2px 8px 0px"}}>
-                    <div className="col-lg-12 h-100">
-                        <h5>Current Courses</h5>
-                        <ul className="list-group list-group-flush">
-                            {userClasses.map((userClass,index) => (
-                                <li className="list-group-item" key={index}>{userClass.class_name} With Professor {userClass.teacher_name} For {userClass.class_credits} Credits</li>))
-                            }
+                <div id="searchResults" className="mt-3">
+                    <h5 className="mb-3" style={{ fontWeight: "bold"}}>Class Recommendations</h5>
+                    {recommendations.length > 0 ? (
+                        <ul className="list-group">
+                            {recommendations.map((recommendation, index) => (
+                                <li 
+                                    className="list-group-item border d-flex justify-content-between align-items-center rounded" 
+                                    key={index} 
+                                    style={{ backgroundColor: "white", marginBottom: "10px", padding: "15px" }}
+                                >
+                                    <div>
+                                        <strong>{recommendation.class_name}</strong>
+                                        <p className="mb-0" style={{ fontSize: "14px", color: "#6c757d" }}>
+                                            With Professor {recommendation.teacher_name}
+                                        </p>
+                                    </div>
+                                    <div className="d-flex align-items-center">
+                                        <span className="badge pillStyle rounded-pill me-2">{recommendation.class_credits} Credits</span>
+                                    </div>
+                                </li>
+                            ))}
                         </ul>
-                    </div>   
-                </div> 
-
-                <div className="row mt-2 justify-content-center p-2 border rounded" style={{background: "white", boxShadow:"rgba(99, 99, 99, 0.2) 0px 2px 8px 0px"}}>
-                    <div className="col-lg-12">
-                        <h5 className="">Course Recommendations</h5>
-                        <ul className="list-group list-group-flush">
-                            <li className="list-group-item">CMSC 341</li>
-                            <li className="list-group-item">CMSC 313</li>
-                            <li className="list-group-item">CMSC 331</li>
-                        </ul>                                        
-                    </div>   
+                    ) : (
+                        <div className="alert alert-warning text-center" role="alert" style={{ fontSize: "1rem", padding: "20px", borderRadius: "10px" }}>
+                            No class recommendations available at the moment.
+                        </div>
+                    )}
                 </div>
             </div>
 

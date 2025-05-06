@@ -18,6 +18,12 @@
     font-weight: 500;
     border-color: rgb(255, 221, 129);
 }
+.pillStyle{
+    background: #fdb515;
+    color: #000 !important;
+    font-weight: 500;
+    border-color: rgb(255, 221, 129);
+}
 
 .navsettings{
     background-image: url('https://styleguide.umbc.edu/wp-content/uploads/sites/113/2019/05/maryland-flag-background-gray.jpg');
