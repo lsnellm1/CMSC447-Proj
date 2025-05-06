@@ -8,7 +8,7 @@ import classSearch from '../adminpage/searchClasses';
 import { useState } from 'react';
 import { getUserInfo } from '../adminpage/classFunctions';
 import { useEffect } from 'react';
-
+import Link from 'next/link';
 interface Class {
     id: number;
     name: string;
@@ -183,6 +183,12 @@ export default function PlanSemester(email: any) {
                         >
                             Search
                         </button>
+                    </div>
+                    <div className="col-md-2">
+
+                        <Link href="/userpage" className="btnStyle btn btn-primary rounded-pill px-4 py-2" style={{ fontSize: "1rem", fontWeight: "500" }}>
+                            Back to User Page
+                        </Link>
                     </div>
                 </div>
             </div>

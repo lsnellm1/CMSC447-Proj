@@ -12,11 +12,6 @@ export async function getUserInfo(email:any){
 // Function to search for a class
 export async function classAdd(className: string, classInstructor: string, classCredits: number, prerequisite: string[]) {
     const sql = neon(`${process.env.DATABASE_URL}`);
-    const classes = await sql`SELECT * FROM classes WHERE class_name = ${className}`;
-    console.log("Classes", classes);
-    if (classes.length > 0) {
-        return false;
-    }
 
     for (const element of prerequisite) {
         console.log("element", element);
