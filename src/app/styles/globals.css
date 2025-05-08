@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+.btnStyle{
+    background: #fdb515;
+    color: #000 !important;
+    font-weight: 500;
+    border-color: rgb(255, 221, 129);
+}
+.btnStyle:hover{
+    background: #ffdd81;
+    color: #000 !important;
+    font-weight: 500;
+    border-color: rgb(253, 181, 21);
+}
+.btnStyle:focus{
+    background: rgb(253, 181, 21);
+    color: #000 !important;
+    font-weight: 500;
+    border-color: rgb(255, 221, 129);
+}
+.pillStyle{
+    background: #fdb515;
+    color: #000 !important;
+    font-weight: 500;
+    border-color: rgb(255, 221, 129);
+}
+
+.navsettings{
+    background-image: url('https://styleguide.umbc.edu/wp-content/uploads/sites/113/2019/05/maryland-flag-background-gray.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed; /* Optional: Fixes the background during scroll */
+    margin: 0;
+    padding: 0;
+}
