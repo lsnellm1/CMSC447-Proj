@@ -5,6 +5,7 @@ import LogOutButton from '../../features/userpage/logout';
 import UMBCSHIELD from "../../../../../public/imgs/UMBC-justSHIELD-color-for-black-backgrounds.png"
 import Image from 'next/image';
 import classSearch from '../adminpage/searchClasses';
+import { getPrerequisites } from '../adminpage/classFunctions';
 import { useState } from 'react';
 import { getUserInfo } from '../adminpage/classFunctions';
 import { useEffect } from 'react';
@@ -14,6 +15,7 @@ interface Class {
     name: string;
     teacher: string;
     credits: number;
+    prerequisites?: string[]; // Added prerequisites property
 }
 
 interface Semester {
@@ -40,10 +42,11 @@ export default function PlanSemester(email: any) {
         setSemesters(updatedSemesters);
     };
 
+
+
     useEffect(() => {
         const getUser = async () => {
             const userData = await getUserInfo(email.email);
-            console.log(userData);
             setCreditsTaken(userData[0].total_credits);
             setCreditsNeeded(userData[0].credits_left);
 
@@ -58,6 +61,18 @@ export default function PlanSemester(email: any) {
 
         getUser();
     }, []);
+
+    const fetchPrerequisites = async (className: string): Promise<any[]> => {
+        try {
+            const prerequisites = await getPrerequisites(className);
+            console.log(`Prerequisites for class ${className}:`, prerequisites);
+            return prerequisites;
+        } catch (error) {
+            console.error(`Error fetching prerequisites for class ${className}:`, error);
+            return [];
+        }
+    };
+
 
     const handleSearch = () => {
         const inputValue = (document.getElementById('searchBar') as HTMLInputElement).value;
@@ -96,8 +111,25 @@ export default function PlanSemester(email: any) {
                     teacherInfo.style.fontSize = '14px';
                     teacherInfo.style.color = '#6c757d';
 
+                    const prerequisitesInfo = document.createElement('p');
+                    prerequisitesInfo.className = 'mb-0';
+                    prerequisitesInfo.style.fontSize = '12px';
+                    prerequisitesInfo.style.color = '#dc3545';
+
+                    fetchPrerequisites(classItem.class_name).then((prerequisites) => {
+                        if (prerequisites.length > 0) {
+                            prerequisitesInfo.textContent = `Prerequisites: ${prerequisites.join(', ')}`;
+                        } else {
+                            prerequisitesInfo.textContent = 'No prerequisites';
+                        }
+                    }).catch((error) => {
+                        console.error('Error fetching prerequisites:', error);
+                        prerequisitesInfo.textContent = 'Error fetching prerequisites';
+                    });
+
                     classInfo.appendChild(className);
                     classInfo.appendChild(teacherInfo);
+                    classInfo.appendChild(prerequisitesInfo);
 
                     const actionContainer = document.createElement('div');
                     actionContainer.className = 'd-flex align-items-center';
@@ -120,11 +152,24 @@ export default function PlanSemester(email: any) {
         });
     };
 
-    const handleDrop = (semesterIndex: number) => {
+    const handleDrop = async (semesterIndex: number) => {
         if (draggedClass) {
-            const updatedSemesters = [...semesters];
-            updatedSemesters[semesterIndex].classes.push(draggedClass);
-            setSemesters(updatedSemesters);
+            // Check if the class already exists in any semester
+            const classExists = semesters.some((semester) =>
+                semester.classes.some((classItem) => classItem.id === draggedClass.id)
+            );
+
+            if (classExists) {
+                alert("This class has already been added to a semester.");
+            } else {
+                const prerequisites = await fetchPrerequisites(draggedClass.name);
+                const updatedSemesters = [...semesters];
+                updatedSemesters[semesterIndex].classes.push({
+                    ...draggedClass,
+                    prerequisites: prerequisites.length > 0 ? prerequisites : ['None']
+                });
+                setSemesters(updatedSemesters);
+            }
             setDraggedClass(null);
         }
     };
@@ -245,16 +290,30 @@ export default function PlanSemester(email: any) {
                                         }
                                     }}
                                 >
-                                    <div className="d-flex justify-content-between align-items-center">
+                                    <div className="d-flex justify-content-between align-items-center mb-2">
                                         <strong>
-                                            {semester.name} ({semester.classes.reduce((total, classItem) => total + classItem.credits, 0)} Credits)
+                                            Semester ({semester.classes.reduce((total, classItem) => total + classItem.credits, 0)} Credits)
                                         </strong>
-                                        <button
-                                            className="btn btn-danger btn-sm"
-                                            onClick={() => handleRemoveSemester(index)}
-                                        >
-                                            Remove
-                                        </button>
+                                        <div className="d-flex align-items-center">
+                                            <select
+                                                className="form-select form-select-sm me-2"
+                                                style={{ width: "120px" }}
+                                                defaultValue=""
+                                            >
+                                                <option value="" disabled>
+                                                    Select Term
+                                                </option>
+                                                <option value="Spring">Spring</option>
+                                                <option value="Fall">Fall</option>
+                                                <option value="Summer">Summer</option>
+                                            </select>
+                                            <button
+                                                className="btn btn-danger btn-sm"
+                                                onClick={() => handleRemoveSemester(index)}
+                                            >
+                                                Remove
+                                            </button>
+                                        </div>
                                     </div>
                                     {semester.classes.reduce((total, classItem) => total + classItem.credits, 0) > 18 && (
                                         <p className="text-danger mt-2">
@@ -282,6 +341,15 @@ export default function PlanSemester(email: any) {
                                                         }}
                                                     >
                                                         With Professor {classItem.teacher}
+                                                    </p>
+                                                    <p
+                                                        className="mb-0"
+                                                        style={{
+                                                            fontSize: "12px",
+                                                            color: "#dc3545"
+                                                        }}
+                                                    >
+                                                        Prerequisites: {classItem.prerequisites && classItem.prerequisites.length > 0 ? classItem.prerequisites.join(', ') : 'None'}
                                                     </p>
                                                 </div>
                                                 <div className="d-flex align-items-center">

@@ -50,7 +50,7 @@ export const SemesterPlanner = () => {
         }));
     };
 
-    const handleDrop = (semesterId: string, slotId: string, course: SearchResult) => {
+    const handleDrop = (semesterId: string, slotId: string, course: SearchResult | null) => {
         setSemesters(semesters.map(semester => {
             if (semester.id === semesterId) {
                 return {

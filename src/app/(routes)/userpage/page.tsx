@@ -192,36 +192,34 @@ export default async function UserPage() {
                     </div>  
                 </div>
 
-                
-
-                <div id="searchResults" className="mt-3">
+                <div id="searchResults" className="mt-3"></div>
                     <h5 className="mb-3" style={{ fontWeight: "bold"}}>Class Recommendations</h5>
                     {recommendations.length > 0 ? (
                         <ul className="list-group">
-                            {recommendations.map((recommendation, index) => (
-                                <li 
-                                    className="list-group-item border d-flex justify-content-between align-items-center rounded" 
-                                    key={index} 
-                                    style={{ backgroundColor: "white", marginBottom: "10px", padding: "15px" }}
-                                >
-                                    <div>
-                                        <strong>{recommendation.class_name}</strong>
-                                        <p className="mb-0" style={{ fontSize: "14px", color: "#6c757d" }}>
-                                            With Professor {recommendation.teacher_name}
-                                        </p>
-                                    </div>
-                                    <div className="d-flex align-items-center">
-                                        <span className="badge pillStyle rounded-pill me-2">{recommendation.class_credits} Credits</span>
-                                    </div>
-                                </li>
-                            ))}
+                            {recommendations
+                                .filter((recommendation, index, self) => 
+                                    self.findIndex(r => r.class_name === recommendation.class_name) === index
+                                )
+                                .map((recommendation, index) => (
+                                    <li 
+                                        className="list-group-item border d-flex justify-content-between align-items-center rounded" 
+                                        key={index} 
+                                        style={{ backgroundColor: "white", marginBottom: "10px", padding: "15px" }}
+                                    >
+                                        <div>
+                                            <strong>{recommendation.class_name}</strong>
+                                        </div>
+                                        <div className="d-flex align-items-center">
+                                            <span className="badge pillStyle rounded-pill me-2">{recommendation.class_credits} Credits</span>
+                                        </div>
+                                    </li>
+                                ))}
                         </ul>
                     ) : (
                         <div className="alert alert-warning text-center" role="alert" style={{ fontSize: "1rem", padding: "20px", borderRadius: "10px" }}>
                             No class recommendations available at the moment.
                         </div>
                     )}
-                </div>
             </div>
 
             <footer className="mt-2">
@@ -245,9 +243,6 @@ export default async function UserPage() {
                     </div>
                 </nav>
             </footer>
-
-
         </>
-
     );
 }

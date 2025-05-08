@@ -14,7 +14,6 @@ export async function classAdd(className: string, classInstructor: string, class
     const sql = neon(`${process.env.DATABASE_URL}`);
 
     for (const element of prerequisite) {
-        console.log("element", element);
         const classLength = await sql`SELECT * FROM classes WHERE class_name = ${element}`;
         if (classLength.length === 0) {
             return false;
@@ -28,11 +27,19 @@ export async function classAdd(className: string, classInstructor: string, class
     return true;
 }
 
+export async function getPrerequisites(className: string) {
+    const sql = neon(`${process.env.DATABASE_URL}`);
+    const classInfo = await sql`SELECT * FROM classes WHERE class_name = ${className}`;
+    if (classInfo.length === 0) {
+        return false;
+    }
+    return classInfo[0].prerequisites;
+}
+
 export async function sendAlert(email: string, alert: string) {
     const sql = neon(`${process.env.DATABASE_URL}`);
     // Log the alert being sent
     const UserSearch = await sql`SELECT * FROM students WHERE email = ${email}`;
-    console.log("UserSearch", UserSearch);
 
     if (UserSearch.length === 0) {
         return false;
@@ -45,9 +52,7 @@ export async function sendAlert(email: string, alert: string) {
 export async function sendRecommendation(email: string,recommendation: string[]) {
     const sql = neon(`${process.env.DATABASE_URL}`);
     for (const element of recommendation) {
-        console.log("element", element);
         const classLength = await sql`SELECT * FROM classes WHERE class_name = ${element}`;
-        console.log("classLength", classLength);
         if (classLength.length === 0) {
             return false;
         }
